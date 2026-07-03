@@ -1,26 +1,5 @@
 {
-  "name": "farmacias-guardia",
-  "version": "1.0.0",
-  "description": "Proyecto buscador de farmacias de guardia",
-  "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "test": "jest"
-  },
-  "keywords": [
-    "farmacia",
-    "guardia",
-    "buscador"
-  ],
-  "author": "urtanta",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.18.2",
-    "@supabase/supabase-js": "^2.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.0",
-    "jest": "^29.0.0"
+    "start": "node server.js"
   }
 }
