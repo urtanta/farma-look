@@ -1,7 +1,11 @@
-// Supabase database connection
-const { createClient } = require('@supabase/supabase-js');
-const config = require('../config');
+// backend/db/supabase.js
+import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-module.exports = supabase;
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY");
+}
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
