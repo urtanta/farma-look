@@ -1,11 +1,19 @@
 {
+  "name": "farma-look",
+  "version": "1.0.0",
+  "description": "Farmacias de guardia",
   "type": "module",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
   },
   "dependencies": {
-    "express": "^5.1.0",
-    "@supabase/supabase-js": "^2.45.0",
-    "cheerio": "^1.0.0"
+    "@supabase/supabase-js": "^2.49.8",
+    "cheerio": "^1.1.2",
+    "express": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
