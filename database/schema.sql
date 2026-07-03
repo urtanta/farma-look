@@ -1,18 +1,29 @@
--- Database schema for Farmacias de Guardia
-
-CREATE TABLE IF NOT EXISTS guardias (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL,
-    phone VARCHAR(20),
-    province VARCHAR(100) NOT NULL,
-    latitude DECIMAL(10, 8),
-    longitude DECIMAL(11, 8),
-    start_date DATE,
-    end_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+create table if not exists pharmacies (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  address text not null,
+  phone text,
+  city text not null,
+  city_slug text not null,
+  created_at timestamptz default now(),
+  unique(name, address)
 );
 
-CREATE INDEX idx_guardias_province ON guardias(province);
-CREATE INDEX idx_guardias_dates ON guardias(start_date, end_date);
+create table if not exists duty_shifts (
+  id uuid primary key default gen_random_uuid(),
+  pharmacy_id uuid references pharmacies(id) on delete cascade,
+  city_slug text not null,
+  starts_at timestamptz not null,
+  ends_at timestamptz not null,
+  source text,
+  scraped_at timestamptz default now()
+);
+
+create index if not exists idx_pharmacies_city_slug
+on pharmacies(city_slug);
+
+create index if not exists idx_duty_shifts_city_slug
+on duty_shifts(city_slug);
+
+create index if not exists idx_duty_shifts_starts_at
+on duty_shifts(starts_at);
