@@ -18,33 +18,43 @@ app.get("/api/health", (req, res) => {
 app.get("/api/guardias", async (req, res) => {
   const city = req.query.city || "vitoria";
 
-  const { data, error } = await supabase
+  const { data: shifts, error: shiftsError } = await supabase
     .from("duty_shifts")
-    .select(`
-      id,
-      starts_at,
-      ends_at,
-      source,
-      pharmacies:pharmacy_id (
-        id,
-        name,
-        address,
-        phone,
-        city
-      )
-    `)
+    .select("id, pharmacy_id, starts_at, ends_at, source, city_slug")
     .eq("city_slug", city)
     .order("starts_at", { ascending: true });
 
-  if (error) {
-    console.error(error);
+  if (shiftsError) {
     return res.status(500).json({
-      error: error.message,
-      details: error
+      error: shiftsError.message,
+      details: shiftsError
     });
   }
 
-  res.json(data || []);
+  if (!shifts || shifts.length === 0) {
+    return res.json([]);
+  }
+
+  const pharmacyIds = shifts.map(s => s.pharmacy_id);
+
+  const { data: pharmacies, error: pharmaciesError } = await supabase
+    .from("pharmacies")
+    .select("id, name, address, phone, city")
+    .in("id", pharmacyIds);
+
+  if (pharmaciesError) {
+    return res.status(500).json({
+      error: pharmaciesError.message,
+      details: pharmaciesError
+    });
+  }
+
+  const result = shifts.map(shift => ({
+    ...shift,
+    pharmacies: pharmacies.find(p => p.id === shift.pharmacy_id) || null
+  }));
+
+  res.json(result);
 });
 
 app.listen(PORT, () => {
