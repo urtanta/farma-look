@@ -1,52 +1,52 @@
-// public/app.js
-
 document.addEventListener("DOMContentLoaded", async () => {
   const app = document.getElementById("app");
 
-  app.innerHTML = `
-    <h1>Farmacias de guardia en Vitoria-Gasteiz</h1>
-    <p>Cargando datos...</p>
-  `;
-
   try {
     const response = await fetch("/api/guardias?city=vitoria");
+    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Error HTTP ${response.status}`);
+      throw new Error(data.error || "Error cargando datos");
     }
-
-    const data = await response.json();
 
     if (!data.length) {
       app.innerHTML = `
         <h1>Farmacias de guardia en Vitoria-Gasteiz</h1>
-        <p>No hay farmacias disponibles ahora mismo.</p>
+        <p>No hay datos disponibles todavía.</p>
       `;
       return;
     }
 
     app.innerHTML = `
       <h1>Farmacias de guardia en Vitoria-Gasteiz</h1>
-      <div class="pharmacy-list">
+      <section class="list">
         ${data.map(renderFarmacia).join("")}
-      </div>
+      </section>
     `;
   } catch (error) {
     app.innerHTML = `
       <h1>Farmacias de guardia en Vitoria-Gasteiz</h1>
-      <p>No se pudieron cargar los datos.</p>
+      <p class="error">No se pudieron cargar los datos.</p>
       <small>${error.message}</small>
     `;
   }
 });
 
-function renderFarmacia(farmacia) {
+function renderFarmacia(item) {
+  const farmacia = item.pharmacies || {};
+
   return `
-    <article class="pharmacy-card">
-      <h2>${farmacia.name || farmacia.nombre || "Farmacia"}</h2>
-      <p>${farmacia.address || farmacia.direccion || ""}</p>
-      <p>${farmacia.phone || farmacia.telefono || ""}</p>
-      <p>${farmacia.city || farmacia.ciudad || "Vitoria-Gasteiz"}</p>
+    <article class="card">
+      <h2>${farmacia.name || "Farmacia"}</h2>
+      <p>${farmacia.address || ""}</p>
+      <p>${farmacia.phone || ""}</p>
+      <p><strong>Inicio:</strong> ${formatDate(item.starts_at)}</p>
+      <p><strong>Fin:</strong> ${formatDate(item.ends_at)}</p>
     </article>
   `;
+}
+
+function formatDate(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleString("es-ES");
 }
