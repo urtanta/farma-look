@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { supabase } from "./db/supabase.js";
+import { scrapeAlavaGuardias } from "./scrapers/alava.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
