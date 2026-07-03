@@ -16,27 +16,35 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/guardias", async (req, res) => {
+  const city = req.query.city || "vitoria";
 
-    const city = req.query.city || "vitoria";
+  const { data, error } = await supabase
+    .from("duty_shifts")
+    .select(`
+      id,
+      starts_at,
+      ends_at,
+      source,
+      pharmacies:pharmacy_id (
+        id,
+        name,
+        address,
+        phone,
+        city
+      )
+    `)
+    .eq("city_slug", city)
+    .order("starts_at", { ascending: true });
 
-    const { data, error } = await supabase
-        .from("duty_shifts")
-        .select(`
-            starts_at,
-            ends_at,
-            pharmacies(
-                name,
-                address,
-                phone
-            )
-        `);
+  if (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: error.message,
+      details: error
+    });
+  }
 
-    if (error) {
-        return res.status(500).json(error);
-    }
-
-    res.json(data);
-
+  res.json(data || []);
 });
 
 app.listen(PORT, () => {
